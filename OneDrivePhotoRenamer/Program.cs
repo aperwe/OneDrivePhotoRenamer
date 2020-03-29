@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -10,8 +11,27 @@ namespace OneDrivePhotoRenamer
 {
     class Program
     {
+        //Typical file name by onedrive and new name pattern.
+        //20190420_114155.jpg => 2019-04-20 11.41.55.jpg
+        //20190414_104305.mp4 => 2019-04-14 10.43.05.mp4
         static void Main(string[] args)
         {
+            #region Test
+            {
+                string inputName = "20190420_114155.jpg";
+                Regex rPattern = new Regex(@"(?'year'^\d{4})(?'month'\d{2})(?'day'\d{2})_(?'hh'\d{2})(?'mm'\d{2})(?'ss'\d{2})");
+                var match = rPattern.Match(inputName);
+                string newName = string.Format("{0}-{1}-{2} {3}.{4}.{5}",
+                    match.Groups["year"],
+                    match.Groups["month"],
+                    match.Groups["day"],
+                    match.Groups["hh"],
+                    match.Groups["mm"],
+                    match.Groups["ss"]);
+            }
+            #endregion
+
+
             if (args.Length < 2)
             {
                 Console.WriteLine("Too few arguments.");
@@ -41,6 +61,7 @@ namespace OneDrivePhotoRenamer
             int numPart = files.Length.ToString().Length;
             Console.WriteLine("Num part will take {0} characters.", numPart);
 
+            //Dictionary of <original name>, <new name>
             Dictionary<string, string> renames = new Dictionary<string, string>();
             int pictureIndex = 1; //Index names from 1
             //Need to escape it in a funny way
